@@ -1,0 +1,74 @@
+/* 紺基調の背景 */
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: linear-gradient(180deg, #0b1a33, #142850);
+  color: #333;
+}
+
+/* ヘッダー */
+.site-header {
+  background: #0b1a33;
+  color: #fff;
+  padding: 1rem;
+  text-align: center;
+}
+.site-header nav a {
+  color: #fff;
+  margin: 0 10px;
+  text-decoration: none;
+}
+.site-header nav a:hover {
+  text-decoration: underline;
+}
+
+/* 白いカード */
+.card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin: 1.5rem auto;
+  width: 90%;
+  max-width: 700px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.3);
+}
+
+/* フッター */
+.site-footer {
+  background: #0b1a33;
+  color: #fff;
+  text-align: center;
+  padding: 1rem;
+}
+
+/* フェードインアニメーション */
+.fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.8s ease forwards;
+}
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* コピー用ボタン */
+.copy-btn {
+  background: #142850;
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+.copy-btn:hover {
+  background: #27496d;
+}
