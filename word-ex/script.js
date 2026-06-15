@@ -1,93 +1,96 @@
 let words = [];
 let currentIndex = 0;
-let isFlipped = false;
-let combo = 0;
-let maxCombo = 0;
+let correctCount = 0;
 
 // JSONから単語データをロード
 async function loadWords() {
     try {
         const response = await fetch('words.json');
         words = await response.json();
-        // 毎回問題をシャッフルしてモチベ維持
-        words.sort(() => Math.random() - 0.5);
-        showWord();
+        words.sort(() => Math.random() - 0.5); // シャッフル
+        
+        document.getElementById('total-q').innerText = words.length;
+        showQuestion();
     } catch (error) {
-        document.getElementById('word-display').innerText = "DATA LOAD ERROR";
+        document.getElementById('meaning-display').innerText = "DATA LOAD ERROR";
     }
 }
 
-// 単語を画面に表示
-function showWord() {
+// 問題を表示（意味を画面に出して、スペルを当てさせる）
+function showQuestion() {
     if (currentIndex >= words.length) {
         showResult();
         return;
     }
-    isFlipped = false;
-    document.getElementById('word-display').innerText = words[currentIndex].word;
-    document.getElementById('word-display').style.color = "#00ffcc";
+    
+    // 進捗更新
+    document.getElementById('current-q').innerText = currentIndex + 1;
+    // 入力欄をクリアしてフォーカス
+    const inputEl = document.getElementById('user-input');
+    inputEl.value = "";
+    inputEl.focus();
+    
+    // 日本語を表示
+    document.getElementById('meaning-display').innerText = words[currentIndex].meaning;
 }
 
-// カードをめくる処理（英⇄日）
-function flipCard() {
-    if (currentIndex >= words.length) return;
-    isFlipped = !isFlipped;
-    const display = document.getElementById('word-display');
-    if (isFlipped) {
-        display.innerText = words[currentIndex].meaning;
-        display.style.color = "#ff007f";
+// 解答送信時の処理
+function submitAnswer(event) {
+    event.preventDefault(); // ページリロード防止
+    
+    const userInput = document.getElementById('user-input').value.trim().toLowerCase();
+    const correctAnswer = words[currentIndex].word.trim().toLowerCase();
+    const overlay = document.getElementById('judge-overlay');
+    
+    if (userInput === correctAnswer) {
+        // ⭕ 正解演出
+        correctCount++;
+        overlay.className = "correct-flash";
     } else {
-        display.innerText = words[currentIndex].word;
-        display.style.color = "#00ffcc";
+        // ❌ 不正解演出
+        overlay.className = "wrong-flash";
     }
+    
+    // 0.2秒後に演出を消して次の問題へ
+    setTimeout(() => {
+        overlay.className = "";
+        currentIndex++;
+        showQuestion();
+    }, 200);
 }
 
-// ⭕❌判定
-function handleAnswer(isCorrect) {
-    if (words.length === 0 || currentIndex >= words.length) return;
-
-    const comboEl = document.getElementById('combo-container');
-
-    if (isCorrect) {
-        combo++;
-        if (combo > maxCombo) maxCombo = combo;
-        // コンボ時に画面をちょっとポップさせる演出
-        comboEl.style.transform = "scale(1.3)";
-        setTimeout(() => comboEl.style.transform = "scale(1)", 100);
-    } else {
-        combo = 0; // 間違えたらコンボストップ！
-    }
-
-    document.getElementById('combo-count').innerText = combo;
-
-    // 次の単語へ
-    currentIndex++;
-    showWord();
-}
-
-// スコア評価（音ゲースタイル）
+// スコア評価（正答率スタイル）
 function showResult() {
     document.getElementById('game-screen').style.display = 'none';
     document.getElementById('result-screen').style.display = 'block';
-    document.getElementById('max-combo').innerText = maxCombo;
+    
+    // 正答率の計算
+    const accuracy = Math.round((correctCount / words.length) * 100);
+    
+    document.getElementById('accuracy').innerText = accuracy;
+    document.getElementById('correct-count').innerText = correctCount;
+    document.getElementById('total-count').innerText = words.length;
 
     const rankEl = document.getElementById('rank');
     
-    // フルコンボならSSS、以下コンボ率に応じてランク変動
-    if (maxCombo === words.length) {
+    // 正答率（%）でガチ判定
+    if (accuracy === 100) {
         rankEl.innerText = "SSS";
-        rankEl.style.color = "#ffff00";
-    } else if (maxCombo >= words.length * 0.7) {
+        rankEl.style.color = "#ffff00"; // ゴールド
+    } else if (accuracy >= 90) {
         rankEl.innerText = "S";
-        rankEl.style.color = "#ff007f";
-    } else if (maxCombo >= words.length * 0.4) {
+        rankEl.style.color = "#ff007f"; // ピンク
+    } else if (accuracy >= 75) {
         rankEl.innerText = "A";
-        rankEl.style.color = "#00ffcc";
-    } else {
+        rankEl.style.color = "#00ffcc"; // シアン
+    } else if (accuracy >= 50) {
         rankEl.innerText = "B";
-        rankEl.style.color = "#888888";
+        rankEl.style.color = "#ffffff"; // ホワイト
+    } else {
+        rankEl.innerText = "C";
+        rankEl.style.color = "#888888"; // グレー
     }
 }
 
-// アプリ起動時にロードを開始
+// 起動
 loadWords();
