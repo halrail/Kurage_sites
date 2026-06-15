@@ -92,5 +92,9 @@ function showResult() {
     }
 }
 
-// 起動
-loadWords();
+// 【修正前】 loadWords();
+
+// 【修正後】 HTMLの読み込みが完全に終わってから起動させる安全装置
+window.addEventListener('DOMContentLoaded', () => {
+    loadWords();
+});
