@@ -144,7 +144,20 @@ function showResult() {
     else { rankEl.innerText = "C"; rankEl.style.color = "#888888"; }
 }
 
-// 起動処理
+// HTMLの読み込みが完全に終わってから起動・ボタンの紐付けを行う安全装置
 window.addEventListener('DOMContentLoaded', () => {
+    // 1. まずデータをロードする
     loadGameData();
+
+    // 2. 「ALLモード」ボタンにクリックイベントを設定
+    const allBtn = document.getElementById('btn-all-mode');
+    if (allBtn) {
+        allBtn.addEventListener('click', () => startGame('all'));
+    }
+
+    // 3. 「お気に入りモード」ボタンにクリックイベントを設定
+    const favBtn = document.getElementById('btn-fav-mode');
+    if (favBtn) {
+        favBtn.addEventListener('click', () => startGame('fav'));
+    }
 });
