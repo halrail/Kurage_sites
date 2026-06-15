@@ -57,6 +57,9 @@ function cleanPhrase(sentence, word) {
     return clean.trim();
 }
 
+// （上の方の getFavorites, startGame などの関数は前回のままでOK！）
+// 変更があるのは handleFormSubmit と showQuestion の一部だぜ！
+
 function showQuestion() {
     if (currentIndex >= testWords.length) {
         showResult();
@@ -65,7 +68,6 @@ function showQuestion() {
     
     isReviewPhase = false;
     
-    // 表示のリセット
     document.getElementById('current-q').innerText = currentIndex + 1;
     document.getElementById('review-container').style.display = 'none';
     document.getElementById('judge-overlay').className = "";
@@ -79,11 +81,10 @@ function showQuestion() {
     inputEl.readOnly = false;
     inputEl.focus();
     
-    // 出題（日本語訳のみをドカンと出す）
+    // 出題（日本語を出す）
     const currentData = testWords[currentIndex];
     document.getElementById('meaning-display').innerText = currentData.meaning;
 
-    // ★ボタンの同期
     const favs = getFavorites();
     const favBtn = document.getElementById('btn-fav');
     if (favs.includes(currentData.word)) {
@@ -93,67 +94,57 @@ function showQuestion() {
     }
 }
 
-// お気に入りトグルのイベント紐付け用
-function handleFavToggle() {
-    const currentWord = testWords[currentIndex].word;
-    let favs = getFavorites();
-    const favBtn = document.getElementById('btn-fav');
-
-    if (favs.includes(currentWord)) {
-        favs = favs.filter(w => w !== currentWord);
-        favBtn.classList.remove('active');
-    } else {
-        favs.push(currentWord);
-        favBtn.classList.add('active');
-    }
-    saveFavorites(favs);
-}
-
-// フォーム送信時のメインロジック（判定 ⇄ 次へ）
+// フォーム送信時（判定 ⇄ 次へ）
 function handleFormSubmit(event) {
     event.preventDefault();
     
-    // フェーズ2: すでに答え合わせ画面なら、次の問題へ進む
     if (isReviewPhase) {
         currentIndex++;
         showQuestion();
         return;
     }
     
-    // フェーズ1: 解答の判定とレビュー表示
     const inputEl = document.getElementById('user-input');
     const userInput = inputEl.value.trim().toLowerCase();
     
-    // 正解フレーズを自動生成（大文字小文字スペースをトリミング）
     const currentData = testWords[currentIndex];
     const correctAnswer = cleanPhrase(currentData.sentence, currentData.word).toLowerCase();
     
     const overlay = document.getElementById('judge-overlay');
+    const statusEl = document.getElementById('review-status');
+    const userDisplayEl = document.getElementById('review-user');
     
-    // 正誤の記録
+    // ⭐【ここが自動判定ハック！】
     if (userInput === correctAnswer) {
         correctCount++;
         overlay.className = "correct-flash";
-        document.getElementById('review-user').style.color = "#00ff66"; // ユーザー入力も緑に
+        
+        statusEl.innerText = "⭕ CORRECT";
+        statusEl.className = "status-correct";
+        userDisplayEl.style.color = "#00ffcc"; // ユーザー入力も緑に
     } else {
         overlay.className = "wrong-flash";
-        document.getElementById('review-user').style.color = "#ff0055"; // 間違ってたらピンクに
+        
+        statusEl.innerText = "❌ WRONG";
+        statusEl.className = "status-wrong";
+        userDisplayEl.style.color = "#ff007f"; // 間違ってたらピンクに
     }
     
-    // 即時正答確認の文字をセットして表示
+    // 答え合わせエリアをセット
     document.getElementById('review-correct').innerText = correctAnswer;
-    document.getElementById('review-user').innerText = userInput || "(空欄)";
+    userDisplayEl.innerText = userInput || "(空欄)";
     document.getElementById('review-container').style.display = 'flex';
     
-    // 入力欄をロックして、ボタンを「NEXT」に変形
     isReviewPhase = true;
     inputEl.readOnly = true;
     
     const submitBtn = document.getElementById('btn-submit');
     submitBtn.innerText = "NEXT STAGE";
     submitBtn.classList.add('next-phase');
-    submitBtn.focus(); // ボタンにフォーカスをあててEnter連打で進めるようにする
+    submitBtn.focus();
 }
+
+// （残りの cleanPhrase, showResult、最後のDOMContentLoadedのリスナーなどは前回のままでOK！）
 
 function showResult() {
     document.getElementById('game-screen').style.display = 'none';

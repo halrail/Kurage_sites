@@ -124,20 +124,48 @@ h1 {
 }
 
 /* レビューエリアのスタイル */
+/* （上のスタイルは全部同じなので省略、レビューエリア周辺を上書き・追記してくれい！） */
+
+/* レビューエリアのスタイル */
 #review-container {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 8px;
     text-align: left;
-    background: rgba(0, 0, 0, 0.4);
-    padding: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 12px;
     border-radius: 8px;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: bold;
 }
 
+/* 自動判定のデカ文字ネオン */
+#review-status {
+    font-size: 1.8rem;
+    font-weight: 900;
+    text-align: center;
+    letter-spacing: 2px;
+    margin-bottom: 5px;
+}
+/* ⭕のとき */
+.status-correct {
+    color: #00ffcc;
+    text-shadow: 0 0 10px #00ffcc;
+}
+/* ❌のとき */
+.status-wrong {
+    color: #ff007f;
+    text-shadow: 0 0 10px #ff007f;
+}
+
 #review-correct { color: #00ffcc; }
-#review-user { color: #ff007f; }
+#review-user { font-weight: bold; }
+
+/* 判定フラッシュの透過度を少し下げてレビューを見やすく調整 */
+.correct-flash { background-color: rgba(0, 255, 102, 0.15); opacity: 1; }
+.wrong-flash { background-color: rgba(255, 0, 85, 0.15); opacity: 1; }
+
+/* あとのボタンやリザルトのスタイルは前回のままでOKだぜ！ */
 
 #judge-overlay {
     position: absolute;
@@ -145,8 +173,6 @@ h1 {
     pointer-events: none;
     opacity: 0;
 }
-.correct-flash { background-color: rgba(0, 255, 102, 0.25); opacity: 1; }
-.wrong-flash { background-color: rgba(255, 0, 85, 0.25); opacity: 1; }
 
 #answer-form {
     display: flex;

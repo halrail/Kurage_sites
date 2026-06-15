@@ -1,60 +1,64 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>トップページ｜Kurage_site</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WORD STAGE - 全文ハック -</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="site-header">
-    <h1>Kurage_site</h1>
-    <nav>
-      <a href="#about">ホーム</a>
-      <a href="#servers">概要</a>
-      <a href="#blogs">ブログ</a>
-      <a href="#news">お知らせ</a>
-      <a href="#join">参加方法</a>
-    </nav>
-  </header>
 
-  <main>
+    <div id="select-screen">
+        <h1>WORD STAGE</h1>
+        <div class="subtitle">SELECT YOUR MISSION</div>
+        
+        <div class="mode-container">
+            <button class="btn-mode" id="btn-all-mode">
+                <span class="mode-title">ALL WORDS STAGE</span>
+                <span class="mode-desc">すべてのフレーズを完答する</span>
+            </button>
+            <button class="btn-mode" id="btn-fav-mode">
+                <span class="mode-title">FAVORITE STAGE</span>
+                <span class="mode-desc">お気に入り（★）だけで完答特訓する</span>
+            </button>
+        </div>
+    </div>
 
-    <section id="about" class="card fade-in">
-      <h2>ようこそ、Kurage_siteへ！</h2>
-      <p>ここはHal Serverの公式サイトです。私たちのサーバーについての情報や最新ニュースをお届けします。</p>
-    </section>
+    <div id="game-screen" style="display: none;">
+        <h1>WORD STAGE</h1>
+        <div class="subtitle">TYPE THE FULL PHRASE</div>
 
-    <section id="servers" class="card fade-in">
-      <h2>運営サーバー</h2>
-      <p>運営サーバー・管理サーバーなどはこちら。</p>
-      <ul>
-        <li><a href="study.html">中高生の勉強部屋！</a></li>
-        <li><a href="rg.html">R&G talk!!</a></li>
-      </ul>
-    </section>
+        <div id="progress-container">STAGE: <span id="current-q">1</span> / <span id="total-q">0</span></div>
 
-    <section id="blogs" class="card fade-in">
-      <h2>しぃむーんのブログ</h2>
-      <p>Discordや勉強などの記録をまとめたブログはこちら。</p>
-    </section>
+        <div id="card">
+            <button id="btn-fav">★</button>
 
-    <section id="news" class="card fade-in">
-      <h2>最新のお知らせ</h2>
-      <p><a href="word-ex/index.html">words-ex機能</a>を追加しました。</p>
-    </section>
+            <div class="display-container">
+                <div id="meaning-display">LOADING...</div>
+                
+                <div id="review-container" style="display: none;">
+                    <div id="review-status"></div>
+                    <div class="review-line">正解: <span id="review-correct"></span></div>
+                    <div class="review-line">あなたの入力: <span id="review-user"></span></div>
+                </div>
+            </div>
+            <div id="judge-overlay"></div>
+        </div>
 
-    <section id="join" class="card fade-in">
-      <h2>参加方法</h2>
-      <p>サーバーIP: <code id="server-ip">tokyogames</code></p>
-      <button class="copy-btn" data-copy-target="#server-ip">コピー</button>
-    </section>
-  </main>
+        <form id="answer-form">
+            <input type="text" id="user-input" autocomplete="off" placeholder="フレーズをまるごと入力..." autofocus>
+            <button type="submit" id="btn-submit">ENTER</button>
+        </form>
+    </div>
 
-  <footer class="site-footer">
-    <p>&copy; 2025 Hal Server</p>
-  </footer>
+    <div id="result-screen" style="display: none;">
+        <h1>STAGE CLEAR</h1>
+        <div class="subtitle">あなたのリザルト</div>
+        <div class="rank-display" id="rank">--</div>
+        <p class="score-text">正答率: <span id="accuracy">0</span>% (<span id="correct-count">0</span>/<span id="total-count">0</span>)</p>
+        <button id="btn-retry" onclick="location.reload()">BACK TO TITLE</button>
+    </div>
 
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
