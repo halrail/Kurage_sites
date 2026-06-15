@@ -2,7 +2,7 @@ let allWords = [];
 let testWords = [];
 let currentIndex = 0;
 let correctCount = 0;
-let isReviewPhase = false; // 現在、答え合わせ画面かどうかを管理
+let isReviewPhase = false;
 
 function getFavorites() {
     const favs = localStorage.getItem('word_stage_favs');
@@ -33,7 +33,6 @@ async function loadGameData() {
 function startGame(mode) {
     const favs = getFavorites();
     if (mode === 'fav') {
-        // お気に入りは、元データの「word」が保存されてるのでそれで判定
         testWords = allWords.filter(item => favs.includes(item.word));
     } else {
         testWords = [...allWords];
@@ -49,16 +48,12 @@ function startGame(mode) {
     showQuestion();
 }
 
-// 穴あき表現（[at the corner of] 等）からピュアな正解フレーズを抽出する関数
 function cleanPhrase(sentence, word) {
-    // もし[ ]が含まれていたら、その中身をwordに置き換えるか、[ ]を取り除く
+    if (!sentence) return word || "";
     let clean = sentence.replace('[ ]', word);
     clean = clean.replace('[', '').replace(']', '');
     return clean.trim();
 }
-
-// （上の方の getFavorites, startGame などの関数は前回のままでOK！）
-// 変更があるのは handleFormSubmit と showQuestion の一部だぜ！
 
 function showQuestion() {
     if (currentIndex >= testWords.length) {
@@ -81,7 +76,6 @@ function showQuestion() {
     inputEl.readOnly = false;
     inputEl.focus();
     
-    // 出題（日本語を出す）
     const currentData = testWords[currentIndex];
     document.getElementById('meaning-display').innerText = currentData.meaning;
 
@@ -94,7 +88,21 @@ function showQuestion() {
     }
 }
 
-// フォーム送信時（判定 ⇄ 次へ）
+function handleFavToggle() {
+    const currentWord = testWords[currentIndex].word;
+    let favs = getFavorites();
+    const favBtn = document.getElementById('btn-fav');
+
+    if (favs.includes(currentWord)) {
+        favs = favs.filter(w => w !== currentWord);
+        favBtn.classList.remove('active');
+    } else {
+        favs.push(currentWord);
+        favBtn.classList.add('active');
+    }
+    saveFavorites(favs);
+}
+
 function handleFormSubmit(event) {
     event.preventDefault();
     
@@ -114,23 +122,19 @@ function handleFormSubmit(event) {
     const statusEl = document.getElementById('review-status');
     const userDisplayEl = document.getElementById('review-user');
     
-    // ⭐【ここが自動判定ハック！】
     if (userInput === correctAnswer) {
         correctCount++;
         overlay.className = "correct-flash";
-        
         statusEl.innerText = "⭕ CORRECT";
         statusEl.className = "status-correct";
-        userDisplayEl.style.color = "#00ffcc"; // ユーザー入力も緑に
+        userDisplayEl.style.color = "#00ffcc";
     } else {
         overlay.className = "wrong-flash";
-        
         statusEl.innerText = "❌ WRONG";
         statusEl.className = "status-wrong";
-        userDisplayEl.style.color = "#ff007f"; // 間違ってたらピンクに
+        userDisplayEl.style.color = "#ff007f";
     }
     
-    // 答え合わせエリアをセット
     document.getElementById('review-correct').innerText = correctAnswer;
     userDisplayEl.innerText = userInput || "(空欄)";
     document.getElementById('review-container').style.display = 'flex';
@@ -143,8 +147,6 @@ function handleFormSubmit(event) {
     submitBtn.classList.add('next-phase');
     submitBtn.focus();
 }
-
-// （残りの cleanPhrase, showResult、最後のDOMContentLoadedのリスナーなどは前回のままでOK！）
 
 function showResult() {
     document.getElementById('game-screen').style.display = 'none';
@@ -164,10 +166,8 @@ function showResult() {
     else { rankEl.innerText = "C"; rankEl.style.color = "#888888"; }
 }
 
-// イベントリスナーの安全バインド
 window.addEventListener('DOMContentLoaded', () => {
     loadGameData();
-
     document.getElementById('btn-all-mode').addEventListener('click', () => startGame('all'));
     document.getElementById('btn-fav-mode').addEventListener('click', () => startGame('fav'));
     document.getElementById('btn-fav').addEventListener('click', handleFavToggle);
