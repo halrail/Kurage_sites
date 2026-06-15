@@ -1,57 +1,122 @@
-let words = [];
+let allWords = [];  // JSONの全単語
+let testWords = []; // 今回のステージで遊ぶ単語
 let currentIndex = 0;
 let correctCount = 0;
 
-// JSONから単語データをロード
-async function loadWords() {
+// LocalStorageからお気に入りリストを取得
+function getFavorites() {
+    const favs = localStorage.getItem('word_stage_favs');
+    return favs ? JSON.parse(favs) : [];
+}
+
+// お気に入りリストをLocalStorageに保存
+function saveFavorites(favs) {
+    localStorage.setItem('word_stage_favs', JSON.stringify(favs));
+}
+
+// 最初に対象データをロードする
+async function loadGameData() {
     try {
         const response = await fetch('words.json');
-        words = await response.json();
-        words.sort(() => Math.random() - 0.5); // シャッフル
+        allWords = await response.json();
         
-        document.getElementById('total-q').innerText = words.length;
-        showQuestion();
+        // お気に入りが0件なら、セレクト画面の「FAVORITE STAGE」ボタンをグレーアウト
+        const favs = getFavorites();
+        const favBtn = document.getElementById('btn-fav-mode');
+        if (favs.length === 0) {
+            favBtn.style.opacity = "0.4";
+            favBtn.style.pointerEvents = "none";
+            document.querySelector('#btn-fav-mode .mode-desc').innerText = "お気に入りが未登録です（ゲーム中に★を押して登録）";
+        }
     } catch (error) {
-        document.getElementById('meaning-display').innerText = "DATA LOAD ERROR";
+        alert("データのロードに失敗しましたYO");
     }
 }
 
-// 問題を表示（意味を画面に出して、スペルを当てさせる）
+// ステージ開始（モード選択）
+function startGame(mode) {
+    const favs = getFavorites();
+
+    if (mode === 'fav') {
+        // お気に入り登録された単語だけを全単語から抽出
+        testWords = allWords.filter(item => favs.includes(item.word));
+    } else {
+        testWords = [...allWords];
+    }
+
+    if (testWords.length === 0) return;
+
+    // シャッフル
+    testWords.sort(() => Math.random() - 0.5);
+
+    // 画面切り替え
+    document.getElementById('select-screen').style.display = 'none';
+    document.getElementById('game-screen').style.display = 'block';
+    document.getElementById('total-q').innerText = testWords.length;
+    
+    showQuestion();
+}
+
+// 問題表示
 function showQuestion() {
-    if (currentIndex >= words.length) {
+    if (currentIndex >= testWords.length) {
         showResult();
         return;
     }
     
-    // 進捗更新
     document.getElementById('current-q').innerText = currentIndex + 1;
-    // 入力欄をクリアしてフォーカス
+    
     const inputEl = document.getElementById('user-input');
     inputEl.value = "";
     inputEl.focus();
     
-    // 日本語を表示
-    document.getElementById('meaning-display').innerText = words[currentIndex].meaning;
+    const currentWordData = testWords[currentIndex];
+    document.getElementById('meaning-display').innerText = currentWordData.meaning;
+    document.getElementById('sentence-display').innerText = currentWordData.sentence;
+
+    // ★マークの状態を反映
+    const favs = getFavorites();
+    const favBtn = document.getElementById('btn-fav');
+    if (favs.includes(currentWordData.word)) {
+        favBtn.classList.add('active');
+    } else {
+        favBtn.classList.remove('active');
+    }
 }
 
-// 解答送信時の処理
+// ★のトグル（登録/解除）処理
+function toggleFavorite() {
+    const currentWord = testWords[currentIndex].word;
+    let favs = getFavorites();
+    const favBtn = document.getElementById('btn-fav');
+
+    if (favs.includes(currentWord)) {
+        // 既にあったら削除
+        favs = favs.filter(w => w !== currentWord);
+        favBtn.classList.remove('active');
+    } else {
+        // なければ追加
+        favs.push(currentWord);
+        favBtn.classList.add('active');
+    }
+    saveFavorites(favs);
+}
+
+// 解答送信
 function submitAnswer(event) {
-    event.preventDefault(); // ページリロード防止
+    event.preventDefault();
     
     const userInput = document.getElementById('user-input').value.trim().toLowerCase();
-    const correctAnswer = words[currentIndex].word.trim().toLowerCase();
+    const correctAnswer = testWords[currentIndex].word.trim().toLowerCase();
     const overlay = document.getElementById('judge-overlay');
     
     if (userInput === correctAnswer) {
-        // ⭕ 正解演出
         correctCount++;
         overlay.className = "correct-flash";
     } else {
-        // ❌ 不正解演出
         overlay.className = "wrong-flash";
     }
     
-    // 0.2秒後に演出を消して次の問題へ
     setTimeout(() => {
         overlay.className = "";
         currentIndex++;
@@ -59,42 +124,27 @@ function submitAnswer(event) {
     }, 200);
 }
 
-// スコア評価（正答率スタイル）
+// リザルト表示
 function showResult() {
     document.getElementById('game-screen').style.display = 'none';
     document.getElementById('result-screen').style.display = 'block';
     
-    // 正答率の計算
-    const accuracy = Math.round((correctCount / words.length) * 100);
+    const accuracy = Math.round((correctCount / testWords.length) * 100);
     
     document.getElementById('accuracy').innerText = accuracy;
     document.getElementById('correct-count').innerText = correctCount;
-    document.getElementById('total-count').innerText = words.length;
+    document.getElementById('total-count').innerText = testWords.length;
 
     const rankEl = document.getElementById('rank');
     
-    // 正答率（%）でガチ判定
-    if (accuracy === 100) {
-        rankEl.innerText = "SSS";
-        rankEl.style.color = "#ffff00"; // ゴールド
-    } else if (accuracy >= 90) {
-        rankEl.innerText = "S";
-        rankEl.style.color = "#ff007f"; // ピンク
-    } else if (accuracy >= 75) {
-        rankEl.innerText = "A";
-        rankEl.style.color = "#00ffcc"; // シアン
-    } else if (accuracy >= 50) {
-        rankEl.innerText = "B";
-        rankEl.style.color = "#ffffff"; // ホワイト
-    } else {
-        rankEl.innerText = "C";
-        rankEl.style.color = "#888888"; // グレー
-    }
+    if (accuracy === 100) { rankEl.innerText = "SSS"; rankEl.style.color = "#ffff00"; }
+    else if (accuracy >= 90) { rankEl.innerText = "S"; rankEl.style.color = "#ff007f"; }
+    else if (accuracy >= 75) { rankEl.innerText = "A"; rankEl.style.color = "#00ffcc"; }
+    else if (accuracy >= 50) { rankEl.innerText = "B"; rankEl.style.color = "#ffffff"; }
+    else { rankEl.innerText = "C"; rankEl.style.color = "#888888"; }
 }
 
-// 【修正前】 loadWords();
-
-// 【修正後】 HTMLの読み込みが完全に終わってから起動させる安全装置
+// 起動処理
 window.addEventListener('DOMContentLoaded', () => {
-    loadWords();
+    loadGameData();
 });

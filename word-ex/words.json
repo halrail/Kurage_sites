@@ -1,6 +1,17 @@
 [
-  { "word": "mitigate", "meaning": "（和らげる、軽減する）" },
-  { "word": "vulnerable", "meaning": "（脆弱な、傷つきやすい）" },
-  { "word": "alternative", "meaning": "（代わりの、選択肢）" },
-  { "word": "privacy", "meaning": "（プライバシー、私生活）" }
+  { 
+    "word": "mitigate", 
+    "meaning": "その新しい法律は、プライバシーのリスクを軽減することを目的としている。",
+    "sentence": "The new law aims to [ ] privacy risks."
+  },
+  { 
+    "word": "vulnerable", 
+    "meaning": "古いシステムはサイバー攻撃に対して脆弱だ。",
+    "sentence": "Old systems are [ ] to cyber attacks."
+  },
+  { 
+    "word": "alternative", 
+    "meaning": "私たちは代わりの計画を見つける必要がある。",
+    "sentence": "We need to find an [ ] plan."
+  }
 ]

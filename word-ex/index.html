@@ -8,29 +8,50 @@
 </head>
 <body>
 
-    <div id="game-screen">
+    <div id="select-screen">
         <h1>WORD STAGE</h1>
-        <div class="subtitle">INPUT THE CORRECT WORD</div>
+        <div class="subtitle">SELECT YOUR MISSION</div>
+        
+        <div class="mode-container">
+            <button class="btn-mode" onclick="startGame('all')">
+                <span class="mode-title">ALL WORDS STAGE</span>
+                <span class="mode-desc">登録されたすべての単語をハックする</span>
+            </button>
+            <button class="btn-mode" id="btn-fav-mode" onclick="startGame('fav')">
+                <span class="mode-title">FAVORITE STAGE</span>
+                <span class="mode-desc">お気に入りの単語（★）だけで特訓する</span>
+            </button>
+        </div>
+    </div>
+
+    <div id="game-screen" style="display: none;">
+        <h1>WORD STAGE</h1>
+        <div class="subtitle">FILL IN THE BLANK</div>
 
         <div id="progress-container">STAGE: <span id="current-q">1</span> / <span id="total-q">0</span></div>
 
         <div id="card">
-            <div id="meaning-display">LOADING...</div>
+            <button id="btn-fav" onclick="toggleFavorite()">★</button>
+
+            <div class="display-container">
+                <div id="meaning-display">LOADING...</div>
+                <div id="sentence-display"></div>
+            </div>
             <div id="judge-overlay"></div>
         </div>
 
         <form id="answer-form" onsubmit="submitAnswer(event)">
-            <input type="text" id="user-input" autocomplete="off" placeholder="単語を入力..." autofocus>
+            <input type="text" id="user-input" autocomplete="off" placeholder="空欄に入る単語を入力..." autofocus>
             <button type="submit" id="btn-submit">ENTER</button>
         </form>
     </div>
 
-    <div id="result-screen">
+    <div id="result-screen" style="display: none;">
         <h1>STAGE CLEAR</h1>
         <div class="subtitle">あなたのリザルト</div>
         <div class="rank-display" id="rank">--</div>
         <p class="score-text">正答率: <span id="accuracy">0</span>% (<span id="correct-count">0</span>/<span id="total-count">0</span>)</p>
-        <button id="btn-retry" onclick="location.reload()">RETRY STAGE</button>
+        <button id="btn-retry" onclick="location.reload()">BACK TO TITLE</button>
     </div>
 
     <script src="script.js"></script>
