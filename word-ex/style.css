@@ -23,7 +23,7 @@ h1 {
     margin-bottom: 30px;
 }
 
-/* モードセレクト画面 */
+/* モードセレクト */
 .mode-container {
     display: flex;
     flex-direction: column;
@@ -63,7 +63,6 @@ h1 {
     font-size: 0.85rem;
 }
 
-/* ゲーム進行画面 */
 #progress-container {
     height: 30px;
     font-size: 1.2rem;
@@ -89,7 +88,6 @@ h1 {
     overflow: hidden;
 }
 
-/* ★ボタン */
 #btn-fav {
     position: absolute;
     top: 15px;
@@ -97,15 +95,13 @@ h1 {
     background: none;
     border: none;
     font-size: 2rem;
-    color: #33394d; /* 未お気に入り時はダークグレー */
+    color: #33394d;
     cursor: pointer;
     padding: 0;
     z-index: 10;
     transition: all 0.2s;
-    text-shadow: none;
 }
 
-/* お気に入り登録時のネオンイエロー */
 #btn-fav.active {
     color: #ffff00;
     text-shadow: 0 0 10px #ffff00, 0 0 20px #ffff00;
@@ -121,18 +117,27 @@ h1 {
 }
 
 #meaning-display {
-    font-size: 1.1rem;
+    font-size: 1.4rem;
     font-weight: bold;
     color: #ffffff;
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 }
 
-#sentence-display {
-    font-size: 1.4rem;
+/* レビューエリアのスタイル */
+#review-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    text-align: left;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 1.1rem;
     font-weight: bold;
-    color: #00ffcc;
-    text-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
 }
+
+#review-correct { color: #00ffcc; }
+#review-user { color: #ff007f; }
 
 #judge-overlay {
     position: absolute;
@@ -140,8 +145,8 @@ h1 {
     pointer-events: none;
     opacity: 0;
 }
-.correct-flash { background-color: rgba(0, 255, 102, 0.3); opacity: 1; }
-.wrong-flash { background-color: rgba(255, 0, 85, 0.3); opacity: 1; }
+.correct-flash { background-color: rgba(0, 255, 102, 0.25); opacity: 1; }
+.wrong-flash { background-color: rgba(255, 0, 85, 0.25); opacity: 1; }
 
 #answer-form {
     display: flex;
@@ -153,7 +158,7 @@ h1 {
 
 #user-input {
     padding: 15px;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     background-color: #1a1d29;
     border: 2px solid #ff007f;
     border-radius: 8px;
@@ -165,6 +170,7 @@ h1 {
     box-shadow: 0 0 15px #ff007f;
 }
 
+/* 解答確定・次へ進むボタン */
 #btn-submit {
     padding: 12px;
     font-size: 1.2rem;
@@ -181,7 +187,13 @@ h1 {
     box-shadow: 0 0px 0 #00b347;
 }
 
-/* リザルト */
+/* ボタンが「NEXT」状態の時の色変更（ネオンピンク） */
+#btn-submit.next-phase {
+    background-color: #ff007f;
+    color: #fff;
+    box-shadow: 0 4px 0 #b30054;
+}
+
 .rank-display {
     font-size: 5rem;
     font-weight: bold;

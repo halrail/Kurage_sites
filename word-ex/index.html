@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WORD STAGE - 単語ハック -</title>
+    <title>WORD STAGE - 全文ハック -</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+    <!-- 1. モードセレクト画面 -->
     <div id="select-screen">
         <h1>WORD STAGE</h1>
         <div class="subtitle">SELECT YOUR MISSION</div>
@@ -15,37 +16,47 @@
         <div class="mode-container">
             <button class="btn-mode" id="btn-all-mode">
                 <span class="mode-title">ALL WORDS STAGE</span>
-                <span class="mode-desc">登録されたすべての単語をハックする</span>
+                <span class="mode-desc">すべてのフレーズを完答する</span>
             </button>
             <button class="btn-mode" id="btn-fav-mode">
                 <span class="mode-title">FAVORITE STAGE</span>
-                <span class="mode-desc">お気に入りの単語（★）だけで特訓する</span>
+                <span class="mode-desc">お気に入り（★）だけで完答特訓する</span>
             </button>
         </div>
     </div>
 
+    <!-- 2. メインのゲーム画面 -->
     <div id="game-screen" style="display: none;">
         <h1>WORD STAGE</h1>
-        <div class="subtitle">FILL IN THE BLANK</div>
+        <div class="subtitle">TYPE THE FULL PHRASE</div>
 
         <div id="progress-container">STAGE: <span id="current-q">1</span> / <span id="total-q">0</span></div>
 
+        <!-- メインカード -->
         <div id="card">
-            <button id="btn-fav" onclick="toggleFavorite()">★</button>
+            <!-- お気に入り★ボタン -->
+            <button id="btn-fav">★</button>
 
             <div class="display-container">
                 <div id="meaning-display">LOADING...</div>
-                <div id="sentence-display"></div>
+                
+                <!-- 即時正答確認エリア（初期状態は非表示） -->
+                <div id="review-container" style="display: none;">
+                    <div class="review-line">⭕ CORRECT: <span id="review-correct"></span></div>
+                    <div class="review-line">👤 YOURS: <span id="review-user"></span></div>
+                </div>
             </div>
             <div id="judge-overlay"></div>
         </div>
 
-        <form id="answer-form" onsubmit="submitAnswer(event)">
-            <input type="text" id="user-input" autocomplete="off" placeholder="空欄に入る単語を入力..." autofocus>
+        <form id="answer-form">
+            <input type="text" id="user-input" autocomplete="off" placeholder="フレーズをまるごと入力..." autofocus>
+            <!-- ボタンの文字をフェーズに合わせてJSで「ENTER」か「NEXT」に切り替えるぜ -->
             <button type="submit" id="btn-submit">ENTER</button>
         </form>
     </div>
 
+    <!-- 3. リザルト画面 -->
     <div id="result-screen" style="display: none;">
         <h1>STAGE CLEAR</h1>
         <div class="subtitle">あなたのリザルト</div>
