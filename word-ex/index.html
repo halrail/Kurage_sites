@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WORD STAGE - 単語ハック -</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="game-screen">
+        <h1>WORD STAGE</h1>
+        <div class="subtitle">TAP TO HACK THE WORD</div>
+
+        <div id="combo-container"><span id="combo-count">0</span> CHAIN!!</div>
+
+        <div id="card" onclick="flipCard()">
+            <div id="word-display">LOADING...</div>
+            <div class="hint">TAP TO FLIP</div>
+        </div>
+
+        <div class="btn-container">
+            <button id="btn-wrong" onclick="handleAnswer(false)">❌ NO</button>
+            <button id="btn-correct" onclick="handleAnswer(true)">⭕ CLEAR</button>
+        </div>
+    </div>
+
+    <div id="result-screen">
+        <h1>STAGE CLEAR</h1>
+        <div class="subtitle">あなたのリザルト</div>
+        <div class="rank-display" id="rank">--</div>
+        <p class="score-text">最大コンボ: <span id="max-combo">0</span></p>
+        <button id="btn-retry" onclick="location.reload()">RETRY STAGE</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
