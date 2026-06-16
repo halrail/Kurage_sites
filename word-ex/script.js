@@ -3,7 +3,7 @@ let testWords = [];
 let currentIndex = 0;
 let correctCount = 0;
 let isReviewPhase = false;
-let currentJsonFile = ""; // 目次から自動で最初のファイルが入るぜ
+let currentJsonFile = "";
 
 function getFavorites() {
     const favs = localStorage.getItem('word_stage_favs');
@@ -14,7 +14,7 @@ function saveFavorites(favs) {
     localStorage.setItem('word_stage_favs', JSON.stringify(favs));
 }
 
-// 🔥 【新機能】最初に目次（menu.json）を読み込んでセレクトボックスを爆破生成する
+// 最初に目次（menu.json）を読み込んでセレクトボックスを自動生成
 async function loadMenuAndInit() {
     try {
         const response = await fetch('json/menu.json');
@@ -26,7 +26,6 @@ async function loadMenuAndInit() {
         stageSelect.innerHTML = "";
         listStageSelect.innerHTML = "";
         
-        // 目次データをもとに、optionタグを自動で生成してハメ込む
         menuItems.forEach(item => {
             const opt1 = document.createElement('option');
             opt1.value = item.file;
@@ -39,7 +38,6 @@ async function loadMenuAndInit() {
             listStageSelect.appendChild(opt2);
         });
         
-        // 最初のファイルを初期ターゲットに設定してロード
         if (menuItems.length > 0) {
             loadGameData(menuItems[0].file);
         }
@@ -86,6 +84,11 @@ function startGame(mode) {
     }
 
     if (testWords.length === 0) return;
+    
+    // カウントやインデックスを初期化（リロードなしで周回するためのリセット）
+    currentIndex = 0;
+    correctCount = 0;
+    
     testWords.sort(() => Math.random() - 0.5);
 
     document.getElementById('select-screen').style.display = 'none';
@@ -93,13 +96,6 @@ function startGame(mode) {
     document.getElementById('total-q').innerText = testWords.length;
     
     showQuestion();
-}
-
-function cleanPhrase(sentence, word) {
-    if (!sentence) return word || "";
-    let clean = sentence.replace('[ ]', word);
-    clean = clean.replace('[', '').replace(']', '');
-    return clean.trim();
 }
 
 function showQuestion() {
@@ -124,7 +120,10 @@ function showQuestion() {
     inputEl.focus();
     
     const currentData = testWords[currentIndex];
-    document.getElementById('meaning-display').innerText = currentData.meaning;
+    
+    // ⭐【修正】お友達の要望通り、sentence（出題文章）がある場合はそのまま無加工で表示！
+    // JSON側で "sentence": "one of my [ _ _ _ ]" と書いてあればそのまま表示されるぜ！
+    document.getElementById('meaning-display').innerText = currentData.sentence ? currentData.sentence : currentData.meaning;
 
     const favs = getFavorites();
     const favBtn = document.getElementById('btn-fav');
@@ -165,14 +164,15 @@ function renderWordList() {
     const favs = getFavorites();
 
     allWords.forEach(item => {
-        const rawPhrase = item.sentence ? cleanPhrase(item.sentence, item.word) : item.word;
+        // ⭐ リスト画面でもカッコを消さずに、データに入っている文章（または単語）をそのまま綺麗に出すぜ
+        const displayPhrase = item.sentence ? item.sentence : item.word;
         const isFav = favs.includes(item.word);
 
         const itemEl = document.createElement('div');
         itemEl.className = "word-item";
         itemEl.innerHTML = `
             <div class="word-info">
-                <div class="word-eng">${rawPhrase}</div>
+                <div class="word-eng">${displayPhrase}</div>
                 <div class="word-jpn">${item.meaning}</div>
             </div>
             <button class="list-fav-btn ${isFav ? 'active' : ''}">★</button>
@@ -200,7 +200,11 @@ function handleFormSubmit(event) {
     const userInput = inputEl.value.trim().toLowerCase();
     
     const currentData = testWords[currentIndex];
-    const correctAnswer = currentData.sentence ? cleanPhrase(currentData.sentence, currentData.word).toLowerCase() : currentData.word.toLowerCase();
+    
+    // ⭐【ここが最大のハック！】
+    // 出題文に [ _ _ _ ] が入っていても、ユーザーが入力して判定する正解は
+    // 常に「item.word（ピュアな単語/フレーズ単体）」になるように固定したぜ！
+    const correctAnswer = currentData.word.trim().toLowerCase();
     
     const overlay = document.getElementById('judge-overlay');
     const statusEl = document.getElementById('review-status');
@@ -249,6 +253,14 @@ function showResult() {
     else { rankEl.innerText = "C"; rankEl.style.color = "#888888"; }
 }
 
+// 🔥 【新機能】リロードせずにタイトル（選択画面）に帰還する
+function backToTitle() {
+    document.getElementById('result-screen').style.display = 'none';
+    document.getElementById('select-screen').style.display = 'block';
+    // 今選ばれているセレクトボックスの状態を維持したまま、メニューのお気に入りボタン等を再計算
+    loadGameData(document.getElementById('stage-select').value);
+}
+
 function switchView(viewName) {
     document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
     document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
@@ -265,7 +277,6 @@ function switchView(viewName) {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-    // 🔥 一番最初は目次ファイルをロードするぜ！
     loadMenuAndInit();
 
     const stageSelect = document.getElementById('stage-select');
